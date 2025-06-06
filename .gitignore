@@ -1,0 +1,10 @@
+archi-admin/*
+!archi-admin/.gitkeep
+
+archi-service/*
+!archi-service/.gitkeep
+
+uploads/*
+!uploads/.gitkeep
+
+.DS_Store
