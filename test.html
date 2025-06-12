@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+  <h2>채팅 메시지 전송</h2>
+  <button onclick="sendTestMessage()">메시지 보내기</button>
+
+  <script>
+    const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUB0ZXN0LmNvbSIsImlhdCI6MTc0OTY3ODUwNCwiZXhwIjoxNzQ5NjgwMzA0fQ.VXRFx30iTiuAwlC5GBZk2MvSvwbZAE6ZPeNyBa2DPGOo5mMn2hFxYECmNv3qqTtkwwaQxmehoRizSvNIejffKA"; // 👈 여기에 실제 AccessToken 복붙
+
+    const socket = new SockJS(`http://localhost:8083/ws?token=${token}`);
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+      console.log('✅ 연결 성공:', frame);
+
+      stompClient.subscribe("/user/queue/chat", function (msg) {
+        console.log("📩 받은 메시지:", msg.body);
+      });
+
+      window.sendTestMessage = () => {
+          const message = {
+            content: "Redis 저장 확인용 메시지입니다"
+          };
+        stompClient.send("/app/chat/sendMessage", {}, JSON.stringify(message));
+        console.log("📤 메시지 전송됨:", message.content);
+      };
+    }, function (error) {
+      console.error("❌ 연결 실패:", error);
+    });
+  </script>
+</body>
+</html>
