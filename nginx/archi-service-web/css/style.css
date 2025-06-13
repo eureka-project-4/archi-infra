@@ -1,0 +1,175 @@
+/* css/style.css */
+
+/* Navigation Tabs */
+.nav-tab {
+    @apply px-6 py-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:text-pink-600 hover:bg-pink-50 transition-all duration-200 cursor-pointer;
+    border-bottom: none;
+}
+
+.nav-tab.active {
+    @apply text-pink-600 bg-pink-50 border-pink-300 font-semibold relative;
+}
+
+.nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ec4899, #f472b6);
+}
+
+.nav-tab:first-child {
+    @apply rounded-tl-lg;
+}
+
+.nav-tab:last-child {
+    @apply rounded-tr-lg;
+}
+
+/* Chat Messages Divider */
+#chat-messages {
+    @apply border border-gray-200 rounded-lg p-3;
+}
+
+.chat-message {
+    @apply p-2 mb-2 rounded-lg border-l-4;
+}
+
+.chat-message.ai {
+    @apply bg-gray-50 border-l-pink-400;
+}
+
+.chat-message.user {
+    @apply bg-pink-50 border-l-gray-400 ml-4;
+}
+
+/* Tab Content */
+.tab-content {
+    @apply hidden;
+}
+
+.tab-content.active {
+    @apply block;
+}
+
+/* Search Filters */
+.search-filter {
+    @apply px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors;
+}
+
+.search-filter.active {
+    @apply bg-pink-500 text-white;
+}
+
+/* Custom Components */
+.service-card {
+    @apply border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer;
+}
+
+.service-card:hover {
+    @apply border-pink-300;
+}
+
+.plan-tag {
+    @apply text-xs px-2 py-1 rounded-full font-medium;
+}
+
+.plan-tag.premium {
+    @apply bg-red-100 text-red-800;
+}
+
+.plan-tag.standard {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.plan-tag.basic {
+    @apply bg-green-100 text-green-800;
+}
+
+/* Status Indicators */
+.status-active {
+    @apply text-green-600 bg-green-100 px-2 py-1 rounded text-xs font-medium;
+}
+
+.status-inactive {
+    @apply text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs font-medium;
+}
+
+/* Chat Interface */
+.chat-message {
+    @apply p-3 rounded-lg mb-3;
+}
+
+.chat-message.user {
+    @apply bg-pink-50 ml-8;
+}
+
+.chat-message.ai {
+    @apply bg-gray-50 mr-8;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-tab {
+        @apply px-2 py-3 text-xs;
+    }
+    
+    .service-card {
+        @apply p-3;
+    }
+    
+    main .flex {
+        @apply flex-col;
+    }
+    
+    .w-80 {
+        @apply w-full mt-6;
+    }
+}
+
+/* Loading States */
+.loading {
+    @apply opacity-50 pointer-events-none;
+}
+
+.spinner {
+    @apply animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500;
+}
+
+/* Custom Scrollbar */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #ec4899;
+    border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: #db2777;
+}
+

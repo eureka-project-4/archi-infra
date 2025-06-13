@@ -119,9 +119,6 @@ services:
     container_name: archi-nginx
     ports:
       - "80:80"
-    depends_on:
-      - archi-admin
-      - archi-service
     networks:
       - archi-network
     restart: unless-stopped

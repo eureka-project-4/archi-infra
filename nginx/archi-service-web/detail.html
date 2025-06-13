@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 상세 보기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+  <main class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-4">📦 상품 상세 정보</h1>
+    <div id="detail-container" class="space-y-4 text-gray-800">
+      <!-- 여기에 상세 정보가 동적으로 표시됨 -->
+    </div>
+    <div class="mt-6 text-center">
+      <a href="main.html" class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">홈으로</a>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    const id = params.get('id');
+
+    const apiUrl = {
+      plan: `/api/service/plans/${id}`,
+      vas: `/api/service/vass/${id}`,
+      coupon: `/api/service/coupons/${id}`,
+    }[type];
+
+        if (!apiUrl) {
+        document.getElementById('detail-container').innerHTML = '<p class="text-red-500">잘못된 접근입니다.</p>';
+        } else {
+        fetch(apiUrl, {
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            }
+        })
+            .then(res => res.json())
+            .then(json => {
+            if (json.resultCode !== 200) throw new Error(json.message);
+            renderDetail(json.data);
+            })
+            .catch(err => {
+            console.error(err);
+            document.getElementById('detail-container').innerHTML = '<p class="text-red-500">정보를 불러오지 못했습니다.</p>';
+            });
+        }
+
+    function renderDetail(data) {
+      const container = document.getElementById('detail-container');
+
+      if (type === 'plan') {
+        container.innerHTML = `
+          <h2 class="text-xl font-bold text-blue-700">${data.planName}</h2>
+          <p>💰 가격: <strong>${data.price.toLocaleString()}원</strong></p>
+          <p>📶 데이터: ${data.monthData}GB</p>
+          <p>📞 통화: ${data.callUsage}</p>
+          <p>💬 문자: ${data.messageUsage}</p>
+          <p>🎁 혜택: ${data.benefit}</p>
+          <p>👥 연령대: ${data.targetAge}</p>
+          <p>📂 카테고리: ${data.category}</p>
+          <p>🏷️ 태그: ${data.tags.join(', ')}</p>
+        `;
+      } else if (type === 'vas') {
+        container.innerHTML = `
+          <h2 class="text-xl font-bold text-green-700">${data.vasName}</h2>
+          <img src="${data.imageUrl}" alt="${data.vasName}" class="w-full h-48 object-cover rounded mb-4">
+          <p>💬 설명: ${data.vasDescription}</p>
+          <p>💰 가격: <strong>${data.discountedPrice || data.price}원</strong></p>
+          ${data.isOnSale ? `<p>🔥 할인율: ${data.saleRate}%</p>` : ''}
+          <p>📂 카테고리: ${data.category}</p>
+          <p>🏷️ 태그: ${data.tags.join(', ')}</p>
+        `;
+      } else if (type === 'coupon') {
+        container.innerHTML = `
+          <h2 class="text-xl font-bold text-yellow-700">${data.couponName}</h2>
+          <img src="${data.imageUrl}" alt="${data.couponName}" class="w-full h-48 object-cover rounded mb-4">
+          <p>💰 가격: <strong>${data.price.toLocaleString()}원</strong></p>
+          <p>📂 카테고리: ${data.category}</p>
+          <p>🏷️ 태그: ${data.tags.join(', ')}</p>
+        `;
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -11,7 +11,7 @@
   <button onclick="sendTestMessage()">메시지 보내기</button>
 
   <script>
-    const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUB0ZXN0LmNvbSIsImlhdCI6MTc0OTY3ODUwNCwiZXhwIjoxNzQ5NjgwMzA0fQ.VXRFx30iTiuAwlC5GBZk2MvSvwbZAE6ZPeNyBa2DPGOo5mMn2hFxYECmNv3qqTtkwwaQxmehoRizSvNIejffKA"; // 👈 여기에 실제 AccessToken 복붙
+    const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUB0ZXN0LmNvbSIsImlhdCI6MTc0OTcxNDcyMiwiZXhwIjoxNzQ5NzE2NTIyfQ.HcQe0YFhqtBSiNk0gtrCsU5MxmS5SxL5sBGM6i3DDvA7eVFMsReVVyci97iEOy5NAwqtq7hmtqlJaQUDdsxX5g"; // 👈 여기에 실제 AccessToken 복붙
 
     const socket = new SockJS(`http://localhost:8083/ws?token=${token}`);
     const stompClient = Stomp.over(socket);
@@ -25,7 +25,7 @@
 
       window.sendTestMessage = () => {
           const message = {
-            content: "Redis 저장 확인용 메시지입니다"
+            content: "두둥 5G요금제 있어?"
           };
         stompClient.send("/app/chat/sendMessage", {}, JSON.stringify(message));
         console.log("📤 메시지 전송됨:", message.content);

@@ -1,7 +1,7 @@
 FROM nginx:alpine
 
 # 정적 파일 복사
-COPY ./archi-admin-web /usr/share/nginx/html/admin
+#COPY ./archi-admin-web /usr/share/nginx/html/admin
 COPY ./archi-service-web /usr/share/nginx/html/main
 
 # Nginx 설정 복사

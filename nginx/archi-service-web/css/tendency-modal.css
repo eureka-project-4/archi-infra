@@ -1,0 +1,54 @@
+/* 모달 오버레이 배경 */
+#tendency-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.4); /* 반투명 블랙 */
+}
+
+/* 모달 본체 */
+#tendency-modal {
+  max-width: 400px;
+  width: 90%;
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* 닫기 버튼 스타일 */
+#close-modal {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  font-size: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+#close-modal:hover {
+  color: #000;
+}
+
+/* 선택지 버튼 공통 */
+#modal-options button {
+  background-color: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+#modal-options button:hover {
+  background-color: #e5e7eb;
+}
+
+/* 반응형 - 모바일 대비 */
+@media (max-width: 480px) {
+  #tendency-modal {
+    padding: 1rem;
+  }
+
+  #modal-options {
+    grid-template-columns: 1fr !important;
+  }
+}
