@@ -111,28 +111,32 @@ function renderServiceTable(serviceData) {
         return;
     }
 
-    tbody.innerHTML = serviceData.content.map(service => `
+    tbody.innerHTML = serviceData.content.map(service => {
+        const finalPrice = service.price * ((100 - service.saleRate) / 100);
+        return `
         <tr>
-            <td>${service.serviceName || '-'}</td>
-            <td>${adminUtils.formatCurrency(service.monthlyFee)}</td>
-            <td>${service.category || '-'}</td>
-            <td><span class="status-badge ${service.isActive ? 'status-active' : 'status-inactive'}">${service.isActive ? '활성' : '비활성'}</span></td>
-            <td>${adminUtils.formatNumber(service.userCount)}</td>
+            <td>${service.vasName || '-'}</td>
+            <td>${service.price || '-'}</td>
+            <td>${service.saleRate || '-'}%</td>
+            <td>${finalPrice.toFixed(0) || '-'}</td>
+            <td>${service.tagList ? service.tagList.join(', ') : '-'}</td>
+            <td>${service.categoryCode || '-'}</td>
             <td>
-                <button class="btn btn-outline" onclick="viewServiceDetail(${service.serviceId})">상세</button>
-                <button class="btn btn-outline" onclick="editService(${service.serviceId})">수정</button>
-                <button class="btn btn-secondary" onclick="deleteServiceConfirm(${service.serviceId})">삭제</button>
+                <button class="btn btn-outline" onclick="viewServiceDetail(${service.vasId})">상세</button>
+                <button class="btn btn-outline" onclick="editService(${service.vasId})">수정</button>
+                <button class="btn btn-secondary" onclick="deleteServiceConfirm(${service.vasId})">삭제</button>
             </td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // 부가서비스 목록 로드
 async function loadServiceList() {
-    const serviceData = await vasApi.getServiceList(currentPage, pageSize);
+    const serviceData = await vasApi.getServiceList(1, 10);
     if (serviceData) {
-        services = serviceData.content || [];
-        renderServiceTable(serviceData);
+        services = serviceData;
+        renderServiceTable({ content: serviceData });
         updateServiceStats();
     }
 }
@@ -157,30 +161,32 @@ async function viewServiceDetail(serviceId) {
 
 // 부가서비스 상세 모달 생성
 function createServiceDetailModal(service) {
+    const finalPrice = service.price * ((100 - service.saleRate) / 100);
+
     const body = `
         <div class="form-group">
             <label class="form-label">서비스명:</label>
             <p>${service.serviceName || '-'}</p>
         </div>
         <div class="form-group">
+            <label class="form-label">설명:</label>
+            <p>${service.vasDescription || '-'}</p>
+        </div>
+        <div class="form-group">
             <label class="form-label">월 요금:</label>
-            <p>${adminUtils.formatCurrency(service.monthlyFee)}</p>
+            <p>${service.price}</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">할인율:</label>
+            <p>${service.saleRate}</p>
+        </div>
+       <div class="form-group">
+            <label class="form-label">최종가:</label>
+            <p>${finalPrice}</p>
         </div>
         <div class="form-group">
             <label class="form-label">카테고리:</label>
-            <p>${service.category || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">설명:</label>
-            <p>${service.description || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">상태:</label>
-            <p><span class="status-badge ${service.isActive ? 'status-active' : 'status-inactive'}">${service.isActive ? '활성' : '비활성'}</span></p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">이용자 수:</label>
-            <p>${adminUtils.formatNumber(service.userCount)}명</p>
+            <p>${service.categoryCode || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">생성일:</label>

@@ -164,19 +164,19 @@ function createPlanDetailModal(plan) {
         </div>
         <div class="form-group">
             <label class="form-label">월 요금:</label>
-            <p>${adminUtils.formatCurrency(plan.monthlyFee)}</p>
+            <p>${plan.price || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">데이터:</label>
-            <p>${plan.dataAmount || '-'}</p>
+            <p>${plan.monthData || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">통화:</label>
-            <p>${plan.voiceMinutes || '-'}</p>
+            <p>${plan.callUsage || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">메시지:</label>
-            <p>${plan.smsCount || '-'}</p>
+            <p>${plan.messageUsage || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">혜택:</label>
@@ -189,6 +189,10 @@ function createPlanDetailModal(plan) {
         <div class="form-group">
             <label class="form-label">연령 코드:</label>
             <p>${plan.ageCode || '-'}</p>
+        </div>
+                <div class="form-group">
+            <label class="form-label">카테고리:</label>
+            <p>${plan.categoryCode || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">생성일:</label>

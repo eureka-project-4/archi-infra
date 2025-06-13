@@ -114,8 +114,8 @@ function renderCouponTable(couponData) {
     tbody.innerHTML = couponData.content.map(coupon => `
         <tr>
             <td>${coupon.couponName || '-'}</td>
-            <td>${coupon.preference || '-'}</td>
-            <td>${coupon.category || '-'}</td>
+            <td>${coupon.tagList ? coupon.tagList.join(', ') : '-'}</td>
+            <td>${coupon.categoryCode || '-'}</td>
             <td>
                 <button class="btn btn-outline" onclick="viewCouponDetail(${coupon.couponId})">상세</button>
                 <button class="btn btn-outline" onclick="editCoupon(${coupon.couponId})">수정</button>
@@ -133,43 +133,6 @@ async function loadCouponList() {
         renderCouponTable({ content: couponData }); // content 형태로 전달
         updateCouponStats();
     }
-}
-
-// 쿠폰 테이블 렌더링
-function renderCouponTable(couponData) {
-    const tbody = document.querySelector('#products .section:nth-child(4) .table tbody');
-    if (!tbody) return;
-
-    if (!couponData || !couponData.content || couponData.content.length === 0) {
-        tbody.innerHTML = adminUtils.createEmptyTableRow(4, '등록된 라이프 혜택이 없습니다.');
-        return;
-    }
-
-    tbody.innerHTML = couponData.content.map(coupon => `
-        <tr>
-            <td>${coupon.couponName || '-'}</td>
-            <td>${getCategoryName(coupon.categoryCode) || '-'}</td>
-            <td>${formatTagCode(coupon.tagCode) || '-'}</td>
-            <td>
-                <button class="btn btn-outline" onclick="viewCouponDetail(${coupon.couponId})">상세</button>
-                <button class="btn btn-outline" onclick="editCoupon(${coupon.couponId})">수정</button>
-                <button class="btn btn-secondary" onclick="deleteCouponConfirm(${coupon.couponId})">삭제</button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// 카테고리 코드를 이름으로 변환
-function getCategoryName(categoryCode) {
-    const categoryMap = {
-        '003': '음식',
-        '004': '쇼핑',
-        '005': '패션',
-        '008': '엔터테인먼트',
-        '010': '뉴스/정보',
-        '011': '기타'
-    };
-    return categoryMap[categoryCode] || categoryCode;
 }
 
 // 태그 코드 포맷팅 (간단히 표시)
@@ -203,28 +166,12 @@ function createCouponDetailModal(coupon) {
             <p>${coupon.couponName || '-'}</p>
         </div>
         <div class="form-group">
-            <label class="form-label">성향:</label>
-            <p>${coupon.preference || '-'}</p>
+            <label class="form-label">태그:</label>
+            <p>${coupon.tagList || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">카테고리:</label>
-            <p>${coupon.category || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">혜택 내용:</label>
-            <p>${coupon.description || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">파트너사:</label>
-            <p>${coupon.partnerCompany || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">할인 금액/비율:</label>
-            <p>${coupon.discountValue || '-'}</p>
-        </div>
-        <div class="form-group">
-            <label class="form-label">유효 기간:</label>
-            <p>${coupon.validityPeriod || '-'}일</p>
+            <p>${coupon.categoryCode || '-'}</p>
         </div>
         <div class="form-group">
             <label class="form-label">생성일:</label>

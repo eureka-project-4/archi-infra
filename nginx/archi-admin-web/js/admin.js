@@ -158,6 +158,10 @@ function initializeModules() {
     if (window.commonCodeModule) {
         window.commonCodeModule.initialize();
     }
+
+    if(window.tagMetaModule){
+        window.tagMetaModule.initialize();
+    }
 }
 
 // 공통 이벤트 설정
