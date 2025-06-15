@@ -1,38 +1,281 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!--공통코드 어필, 내일 시연용, 디자인 간단하게-->
 <head>
     <meta charset="UTF-8">
-    <title>WebSocket Test</title>
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <title>Admin Test</title>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-<h2>채팅 메시지 전송</h2>
-<button onclick="sendTestMessage()">메시지 보내기</button>
+<div class="header">
+    <div class="logo">
+        <div class="logo-icon">||||</div>
+        유독 + Archi
+        <div class="admin-badge">관리자</div>
+    </div>
+    <div class="header-actions">
+        <div class="user-info">
+            <div class="user-avatar">관</div>
+            <span>관리자</span>
+        </div>
+    </div>
+</div>
 
-<script>
-    const token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUB0ZXN0LmNvbSIsImlhdCI6MTc0OTY3ODUwNCwiZXhwIjoxNzQ5NjgwMzA0fQ.VXRFx30iTiuAwlC5GBZk2MvSvwbZAE6ZPeNyBa2DPGOo5mMn2hFxYECmNv3qqTtkwwaQxmehoRizSvNIejffKA"; // 👈 여기에 실제 AccessToken 복붙
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">시스템 관리</h1>
+        <p class="page-subtitle">상품, 서비스 및 시스템 설정을 관리합니다</p>
+    </div>
 
-    const socket = new SockJS(`http://localhost:8083/ws?token=${token}`);
-    const stompClient = Stomp.over(socket);
+    <div class="tab-container">
+        <div class="tab-header">
+            <button class="tab-button active" onclick="switchTab('products')">상품 관리</button>
+            <button class="tab-button" onclick="switchTab('codes')">공통코드 관리</button>
+        </div>
 
-    stompClient.connect({}, function (frame) {
-        console.log('✅ 연결 성공:', frame);
+        <div class="tab-content">
+            <!-- 상품 관리 탭 -->
+            <div id="products" class="tab-panel active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">등록된 요금제</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">부가서비스</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">라이프 혜택</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-label">총 가입자</div>
+                    </div>
+                </div>
 
-        stompClient.subscribe("/user/queue/chat", function (msg) {
-            console.log("📩 받은 메시지:", msg.body);
-        });
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">📱</div>
+                        요금제 관리
+                    </h2>
 
-        window.sendTestMessage = () => {
-            const message = {
-                content: "Redis 저장 확인용 메시지입니다"
-            };
-            stompClient.send("/app/chat/sendMessage", {}, JSON.stringify(message));
-            console.log("📤 메시지 전송됨:", message.content);
-        };
-    }, function (error) {
-        console.error("❌ 연결 실패:", error);
-    });
-</script>
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="요금제명으로 검색...">
+                        <button class="btn btn-primary">+ 새 요금제 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>요금제명</th>
+                                <th>월 요금</th>
+                                <th>데이터</th>
+                                <th>통화</th>
+                                <th>메세지</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--db 에서 가져오기, 상세버튼, 수정버튼-->
+                                <!--상세버튼 : benefit, tag_code, age_code, createdAt, updatedAt-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">⚡</div>
+                        부가서비스 관리
+                    </h2>
+
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="서비스명으로 검색...">
+                        <button class="btn btn-primary">+ 새 서비스 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>서비스명</th>
+                                <th>월 요금</th>
+                                <th>할인율</th>
+                                <th>최종가</th>
+                                <th>태그</th>
+                                <th>카테고리</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--DB 에서 부가서비스 가져오는 부분-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">🎁</div>
+                        라이프 혜택 관리
+                    </h2>
+
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="혜택명으로 검색...">
+                        <button class="btn btn-primary">+ 새 혜택 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>혜택</th>
+                                <th>태그</th>
+                                <th>카테고리</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--DB 에서 라이프혜택 가져오는 부분-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 공통코드 관리 탭 -->
+            <div id="codes" class="tab-panel">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">그룹 코드</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">45</div>
+                        <div class="stat-label">세부 코드</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">최근 수정</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">활성 비율</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">📋</div>
+                        그룹 코드 관리
+                    </h2>
+
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="그룹 코드명으로 검색...">
+                        <button class="btn btn-primary">+ 새 그룹 코드 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>그룹 코드</th>
+                                <th>코드 설명</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--DB 에서 group_code 가져오기-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">🔧</div>
+                        공통 코드 관리
+                    </h2>
+
+                    <div class="search-bar">
+                        <select class="form-input" style="width: 200px; margin-right: 12px;">
+                            <option>전체 그룹</option>
+                            <!--DB 에서 그룹코드 리스트 가져오기, 우선순위 낮음-->
+                        </select>
+                        <input type="text" class="search-input" placeholder="코드 또는 코드명으로 검색...">
+                        <button class="btn btn-primary">+ 새 공통 코드 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>그룹 코드</th>
+                                <th>공통 코드</th>
+                                <th>공통 코드 설명</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--DB 에서 common_code 가져오기-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <div class="section-icon">🔧</div>
+                        성향 태그 관리
+                    </h2>
+
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="코드 또는 코드명으로 검색...">
+                        <button class="btn btn-primary">+ 새 성향 태그 추가</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>태그 타입</th>
+                                <th>태그 키</th>
+                                <th>태그 설명</th>
+                                <th>Bit Position(0 ~ 63)</th>
+                                <th>관리</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <!--DB 에서 tag_meta 가져오기-->
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/admin.js"></script>
+<script src="js/plan.js"></script>
+<script src="js/vas.js"></script>
+<script src="js/coupon.js"></script>
+<script src="js/groupCode.js"></script>
+<script src="js/commonCode.js"></script>
+<script src="js/tagMeta.js"></script>
 </body>
 </html>
