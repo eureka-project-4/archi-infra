@@ -27,6 +27,7 @@ class ChatBot {
   }
 
   async loadChatHistory() {
+	
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
@@ -100,8 +101,10 @@ class ChatBot {
       this.stompClient.subscribe('/user/queue/chat', (message) => {
         const data = JSON.parse(message.body);
         // 봇 메시지만 표시 (사용자 메시지는 sendMessage에서 이미 표시됨)
+        console.log(data);
         if (data.sender === 'BOT') {
           this.appendMessage('bot', data.content, data.type);
+          this.loadChatHistory();
         }
       });
       
