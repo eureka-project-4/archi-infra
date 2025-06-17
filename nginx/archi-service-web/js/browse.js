@@ -62,12 +62,16 @@ async function initBrowseTab() {
       `;
     };
 
-    // HTML 삽입 - 제목 중복 제거
-    const allItems = [
-      ...plans.map(item => ({...item, type: 'plan'})),
-      ...vass.map(item => ({...item, type: 'vas'})),
-      ...coupons.map(item => ({...item, type: 'coupon'}))
-    ];
+	
+	const plansArray = Array.isArray(plans?.content) ? plans.content : [];
+	const vassArray = Array.isArray(vass?.content) ? vass.content : [];
+	const couponsArray = Array.isArray(coupons?.content) ? coupons.content : [];
+	
+	const allItems = [
+	...plansArray.map(item => ({...item, type: 'plan'})),
+	...vassArray.map(item => ({...item, type: 'vas'})),
+	...couponsArray.map(item => ({...item, type: 'coupon'}))
+	];
     
     const cardsHTML = allItems.map(item => createCard(item, item.type)).join('');
     contentEl.innerHTML = `

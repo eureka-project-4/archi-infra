@@ -1,8 +1,9 @@
 // auth.js - 공통 API 요청 및 토큰 갱신 처리 모듈
 
-let accessToken = null;
+(function() {
+  let accessToken = null;
 
-export function setAccessToken(token) {
+function setAccessToken(token) {
   accessToken = token;
 }
 
@@ -17,7 +18,7 @@ async function refreshAccessToken() {
   return accessToken;
 }
 
-export async function apiRequest(url, options = {}) {
+async function apiRequest(url, options = {}) {
   if (!accessToken) throw new Error("No access token");
 
   const headers = options.headers || {};
@@ -41,14 +42,22 @@ export async function apiRequest(url, options = {}) {
   return response;
 }
 
-export function logout() {
+function logout() {
   localStorage.removeItem("accessToken");
   window.location.href = "/login.html";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const logoutBtn = document.getElementById("logout-button");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", logout);
-  }
-});
+  // 전역 객체에 함수들을 노출
+  window.AuthModule = {
+    setAccessToken,
+    apiRequest,
+    logout
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.getElementById("logout-button");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", logout);
+    }
+  });
+})();
