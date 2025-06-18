@@ -1,4 +1,4 @@
-// stomp-chatbot.js - 최종본
+// stomp-chatbot.js - 요금제 버튼 추가 버전
 class ChatBot {
   constructor() {
     this.stompClient = null;
@@ -17,7 +17,6 @@ class ChatBot {
     this.helpBtn = document.getElementById("help-button");
     this.tooltip = document.getElementById("help-tooltip");
     
-    // 이벤트 리스너
     this.sendButton.addEventListener('click', () => this.sendMessage());
     this.chatInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') this.sendMessage();
@@ -27,19 +26,14 @@ class ChatBot {
   }
 
   async loadChatHistory() {
-	
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
     try {
-      // JWT에서 userId 추출 (간단한 방법)
       const payload = JSON.parse(atob(token.split('.')[1]));
-      this.currentUserId = payload.userId || payload.sub || 1; // fallback
-      console.log('User ID:', this.currentUserId);
+      this.currentUserId = payload.userId || payload.sub || 1;
 
       const url = `/api/service/chats/history/${this.currentUserId}?page=0&size=20`;
-      console.log('히스토리 API 호출:', url);
-
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -47,19 +41,17 @@ class ChatBot {
       });
 
       const result = await response.json();
-      console.log('히스토리 응답:', result);
       
       if (result.resultCode === 200 && result.data && result.data.length > 0) {
         this.messagesContainer.innerHTML = '';
         result.data.forEach(msg => {
           const senderType = msg.sender === 'BOT' ? 'bot' : 'user';
-          this.appendMessage(senderType, msg.content, msg.type);
+          this.appendMessage(senderType, msg.content, msg.type, msg.mentionedPlans);
         });
       } else {
         this.appendMessage('bot', '안녕하세요! 궁금한 것이 있으시면 언제든 물어보세요.');
       }
     } catch (error) {
-      console.error('채팅 히스토리 로드 실패:', error);
       this.appendMessage('bot', '안녕하세요! 궁금한 것이 있으시면 언제든 물어보세요.');
     }
   }
@@ -81,7 +73,6 @@ class ChatBot {
   connect() {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      console.error('토큰이 없습니다');
       return;
     }
     
@@ -92,24 +83,19 @@ class ChatBot {
       'Authorization': `Bearer ${token}`
     };
 
-    this.stompClient.debug = null; // 디버그 로그 비활성화
+    this.stompClient.debug = null;
 
     this.stompClient.connect(headers, () => {
       this.isConnected = true;
-      console.log('STOMP 연결 성공');
       
       this.stompClient.subscribe('/user/queue/chat', (message) => {
         const data = JSON.parse(message.body);
-        // 봇 메시지만 표시 (사용자 메시지는 sendMessage에서 이미 표시됨)
-        console.log(data);
         if (data.sender === 'BOT') {
-          this.appendMessage('bot', data.content, data.type);
-          this.loadChatHistory();
+          this.appendMessage('bot', data.content, data.type, data.mentionedPlans);
         }
       });
       
     }, (error) => {
-      console.error('STOMP 연결 실패:', error);
       this.isConnected = false;
       setTimeout(() => this.connect(), 5000);
     });
@@ -138,13 +124,80 @@ class ChatBot {
     this.appendMessage('user', 'AI 추천을 요청했습니다.');
   }
 
-  appendMessage(type, text, messageType = null) {
+  handlePlanButtonClick(planName) {
+    this.searchPlanAndNavigate(planName);
+  }
+
+  async searchPlanAndNavigate(planName) {
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('/api/service/plans/search?name=' + encodeURIComponent(planName), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (result.resultCode === 200 && result.data) {
+        window.location.href = `/detail.html?type=plan&id=${result.data.planId}`;
+      } else {
+        this.fallbackToChatQuestion(planName);
+      }
+    } catch (error) {
+      console.error('요금제 검색 실패:', error);
+      this.fallbackToChatQuestion(planName);
+    }
+  }
+
+  fallbackToChatQuestion(planName) {
+    const message = `${planName} 요금제에 대해 자세히 알려주세요.`;
+    this.appendMessage('user', message);
+    
+    if (this.isConnected) {
+      this.stompClient.send('/app/chat/sendMessage', {}, JSON.stringify({
+        content: message,
+        planName: planName
+      }));
+    }
+  }
+
+  createPlanButtons(mentionedPlans) {
+    if (!mentionedPlans) return null;
+
+    let planNames = [];
+    if (typeof mentionedPlans === 'string') {
+      planNames = mentionedPlans.split(/[,\n]/).map(name => name.trim()).filter(name => name);
+    } else if (Array.isArray(mentionedPlans)) {
+      planNames = mentionedPlans;
+    } else {
+      planNames = [String(mentionedPlans)];
+    }
+
+    if (planNames.length === 0) return null;
+
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'max-w-[75%] flex flex-wrap gap-2 mt-1';
+
+    planNames.forEach((planName) => {
+      const button = document.createElement('button');
+      button.className = 'px-3 py-2 text-xs bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-md';
+      
+      button.textContent = planName;
+      button.addEventListener('click', () => this.handlePlanButtonClick(planName));
+      
+      buttonsContainer.appendChild(button);
+    });
+
+    return buttonsContainer;
+  }
+
+  appendMessage(type, text, messageType = null, mentionedPlans = null) {
     const wrapper = document.createElement('div');
     wrapper.className = `flex ${type === 'bot' ? 'justify-start' : 'justify-end'} mb-2`;
 
     const bubble = document.createElement('div');
-    
-    // SUGGESTION 타입일 때 특별한 스타일
+
     if (messageType === 'SUGGESTION') {
       bubble.className = 'max-w-[75%] text-sm px-4 py-3 rounded-lg bg-white border-4 border-gradient shadow-lg transform hover:scale-105 transition-all duration-300';
       bubble.style.borderImage = 'linear-gradient(135deg, #ec4899, #8b5cf6) 1';
@@ -165,19 +218,30 @@ class ChatBot {
     }
 
     wrapper.appendChild(bubble);
+    
+    if (type === 'bot' && mentionedPlans) {
+      const planButtons = this.createPlanButtons(mentionedPlans);
+      if (planButtons) {
+        const buttonWrapper = document.createElement('div');
+        buttonWrapper.className = 'flex justify-start mb-2';
+        buttonWrapper.appendChild(planButtons);
+        this.messagesContainer.appendChild(wrapper);
+        this.messagesContainer.appendChild(buttonWrapper);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        return;
+      }
+    }
+
     this.messagesContainer.appendChild(wrapper);
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 라이브러리 로드 대기
   const checkLibraries = () => {
     if (typeof SockJS !== 'undefined' && typeof Stomp !== 'undefined') {
-      console.log('라이브러리 로드 완료, ChatBot 초기화');
       new ChatBot();
     } else {
-      console.log('라이브러리 로드 대기 중...');
       setTimeout(checkLibraries, 100);
     }
   };
