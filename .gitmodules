@@ -1,9 +1,15 @@
 [submodule "archi-admin"]
-	path = archi-admin
-	url = https://github.com/eureka-project-4/archi-admin.git
-[submodule "archi-service"]
-	path = archi-service
-	url = https://github.com/eureka-project-4/archi-service.git
+  path = archi-admin
+  url  = git@github.com:eureka-project-4/archi-admin.git
+
 [submodule "archi-ai"]
-	path = archi-ai
-	url = git@github.com:eureka-project-4/Archi-AI.git
+  path = archi-ai
+  url  = git@github.com:eureka-project-4/Archi-AI.git
+
+[submodule "archi-service"]
+  path = archi-service
+  url  = git@github.com:eureka-project-4/archi-service.git
+  
+[submodule "archi-front"]
+	path = archi-front
+	url = git@github.com:eureka-project-4/archi-front.git

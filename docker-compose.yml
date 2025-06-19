@@ -114,7 +114,7 @@ services:
    
   nginx:
     build:
-      context: ./nginx
+      context: ./archi-front
       dockerfile: Dockerfile
     container_name: archi-nginx
     ports:
