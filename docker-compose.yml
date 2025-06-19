@@ -123,6 +123,22 @@ services:
       - archi-network
     restart: unless-stopped
 
+  mysql-exporter:
+    container_name: mysql-exporter
+    image: prom/mysqld-exporter
+    command:
+      - '--config.my-cnf=/etc/mysql/exporter.cnf'
+      - "--collect.global_status"
+      - "--collect.info_schema.innodb_metrics"
+    volumes:
+      - ./config/exporter.cnf:/etc/mysql/exporter.cnf:ro
+    ports:
+      - "9104:9104"
+    depends_on:
+      - mysql
+    networks:
+      - archi-network
+
 volumes:
   mysql_data:
     driver: local
