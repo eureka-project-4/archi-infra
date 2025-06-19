@@ -9,3 +9,7 @@
 [submodule "archi-service"]
   path = archi-service
   url  = git@github.com:eureka-project-4/archi-service.git
+  
+[submodule "archi-front"]
+	path = archi-front
+	url = git@github.com:eureka-project-4/archi-front.git
