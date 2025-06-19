@@ -7,6 +7,7 @@ class ChatBot {
     this.initElements();
     this.connect();
     this.loadChatHistory();
+    this.initImageUpload();
   }
 
   initElements() {
@@ -23,6 +24,99 @@ class ChatBot {
     });
     this.aiRecommendButton.addEventListener('click', () => this.requestRecommendation());
     this.setupHelpTooltip();
+  }
+
+  initImageUpload() {
+    const uploadImageButton = document.getElementById('upload-image-button');
+    const imageModal = document.getElementById('imageModal');
+    const submitImageBtn = document.getElementById('submitImageBtn');
+    const imageInput = document.getElementById('imageInputModal');
+    const selectedFileInfo = document.getElementById('selectedFileInfo');
+    const fileNameSpan = document.getElementById('fileName');
+
+    if (uploadImageButton) {
+      uploadImageButton.addEventListener('click', () => {
+        imageModal.style.display = 'flex';
+      });
+    }
+
+    if (submitImageBtn) {
+      submitImageBtn.addEventListener('click', () => this.handleImageSubmit());
+    }
+
+    // ✅ input change 핸들러 — 핵심!
+    if (imageInput) {
+      imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // 파일명 표시
+          if (fileNameSpan) {
+            fileNameSpan.textContent = file.name;
+          }
+          if (selectedFileInfo) {
+            selectedFileInfo.classList.remove('hidden');
+          }
+          submitImageBtn.disabled = false;
+        } else {
+          if (selectedFileInfo) {
+            selectedFileInfo.classList.add('hidden');
+          }
+          submitImageBtn.disabled = true;
+        }
+      });
+    }
+
+    // ✅ 모달 닫기 (reset 포함)
+    window.closeModal = () => {
+      imageModal.style.display = 'none';
+      if (imageInput) imageInput.value = '';
+      if (selectedFileInfo) selectedFileInfo.classList.add('hidden');
+      submitImageBtn.disabled = true;
+    };
+  }
+
+
+  async handleImageSubmit() {
+    const input = document.getElementById('imageInputModal');
+    const file = input.files[0];
+
+    if (!file) {
+      alert('이미지를 선택해주세요.');
+      return;
+    }
+
+    // 이미지 업로드 시작 메시지 표시
+    this.appendMessage('user', '이미지를 분석 중입니다...', 'IMAGE_UPLOAD');
+
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      const res = await fetch('/api/service/tendency/image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        this.appendMessage('bot', '이미지 분석 요청이 완료되었습니다. 잠시만 기다려주세요...', 'SYSTEM');
+        window.closeModal();
+
+        // 성공 메시지를 사용자에게 표시
+        console.log('이미지 분석 요청 성공:', result.message);
+      } else {
+        const err = await res.json();
+        this.appendMessage('bot', `이미지 분석 요청 실패: ${err.message || '서버 오류'}`, 'ERROR');
+        console.error('이미지 업로드 실패:', err);
+      }
+    } catch (err) {
+      console.error('네트워크 오류:', err);
+      this.appendMessage('bot', '네트워크 오류가 발생했습니다. 다시 시도해주세요.', 'ERROR');
+    }
   }
 
   async loadChatHistory() {
@@ -94,11 +188,27 @@ class ChatBot {
           this.appendMessage('bot', data.content, data.type, data.mentionedPlans);
         }
       });
+
+      // 이미지 분석 결과 구독 추가
+      this.stompClient.subscribe('/user/queue/chat', (message) => {
+        const data = JSON.parse(message.body);
+        this.handleImageAnalysisResult(data);
+      });
+
       
     }, (error) => {
       this.isConnected = false;
       setTimeout(() => this.connect(), 5000);
     });
+  }
+
+  handleImageAnalysisResult(data) {
+    // 이미지 분석 결과 처리
+    if (data.type === 'IMAGE_ANALYSIS_RESULT') {
+      this.appendMessage('bot', data.content, 'IMAGE_ANALYSIS', data.mentionedPlans);
+    } else if (data.type === 'IMAGE_ANALYSIS_ERROR') {
+      this.appendMessage('bot', `이미지 분석 중 오류가 발생했습니다: ${data.content}`, 'ERROR');
+    }
   }
 
   sendMessage() {
